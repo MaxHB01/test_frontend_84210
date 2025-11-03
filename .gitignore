@@ -1,0 +1,62 @@
+# --- Node / package managers ---
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-store/
+# package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# --- Next.js ---
+.next/
+out/
+.next/cache/
+# Next.js config/artifacts
+*.next.swc
+.swc/
+
+# --- Build / dist ---
+dist/
+build/
+coverage/
+*.tsbuildinfo
+
+# --- Env files (keep examples) ---
+.env
+.env.*.local
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+!.env.example
+
+# --- Vercel / deployment ---
+.vercel/
+
+# --- Lint / tooling caches ---
+.eslintcache
+.stylelintcache
+
+# --- Editors / IDEs ---
+.vscode/
+.idea/
+*.iml
+
+# --- OS files ---
+.DS_Store
+Thumbs.db
+
+# --- Optional: Yarn Berry (comment out if not using) ---
+# .yarn/*
+# !.yarn/releases
+# !.yarn/plugins
+# !.yarn/sdks
+# !.yarn/versions
+
+# --- Optional: TurboRepo cache (comment out if not using) ---
+# .turbo/
+
+# --- Optional: Storybook (comment out if not using) ---
+# storybook-static/

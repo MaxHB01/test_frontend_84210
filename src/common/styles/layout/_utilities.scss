@@ -1,0 +1,34 @@
+// Layout utilities
+.wrapper {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	height: 100dvh;
+	width: 100dvw;
+}
+
+.form-wrapper {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	min-height: 100vh;
+	padding: 1rem;
+	background-color: var(--background);
+}
+
+.card-wrapper {
+	width: 100%;
+	max-width: 28rem;
+}
+
+@media (max-width: 640px) {
+	.form-wrapper {
+		padding: 0.5rem;
+	}
+
+	.card-wrapper {
+		max-width: 100%;
+	}
+}

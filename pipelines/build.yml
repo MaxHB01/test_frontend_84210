@@ -1,0 +1,77 @@
+# Node.js
+# Build a general Node.js project with npm.
+# Add steps that analyze code, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/javascript
+
+trigger:
+  - main
+
+pr:
+  - main
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+  - task: NodeTool@0
+    inputs:
+      versionSpec: "20.x"
+    displayName: "Install Node.js"
+
+  - script: mkdir -p $(Pipeline.Workspace)/node_modules
+    displayName: "Ensure node_modules cache folder exists"
+
+  - task: Cache@2
+    inputs:
+      key: 'npm | "$(Agent.OS)" | package-lock.json'
+      restoreKeys: |
+        npm | "$(Agent.OS)"
+      path: $(Pipeline.Workspace)/node_modules
+    displayName: "Cache node_modules"
+
+  - script: |
+      npm install
+    displayName: "Running: npm install"
+
+  - script: |
+      npm run format
+    displayName: "Running: npm run format"
+
+  - script: |
+      npm run lint
+    displayName: "Running: npm run lint"
+
+  - script: |
+      npm test
+    displayName: "Running: npm test"
+
+
+  - task: SonarQubePrepare@7
+    condition: eq(variables['Build.SourceBranch'], 'refs/heads/main')
+    inputs:
+      SonarQube: 'SonarQube'
+      scannerMode: 'cli'
+      configMode: 'manual'
+      cliProjectKey: 'se-vt-s7-group1_Frontend_c30be9ec-2fae-4920-9d1a-e163cdcea211'
+      cliSources: '.'
+
+
+  - script: |
+      npm run build
+    displayName: "Running: npm run build"
+
+  - task: PublishBuildArtifacts@1
+    inputs:
+      pathToPublish: ".next"
+      artifactName: "nextjs-build"
+      publishLocation: "Container"
+    displayName: "Publishing Build Artifacts"
+
+  - task: SonarQubeAnalyze@7
+    condition: eq(variables['Build.SourceBranch'], 'refs/heads/main')
+    inputs:
+      jdkversion: 'JAVA_HOME'
+  - task: SonarQubePublish@7
+    condition: eq(variables['Build.SourceBranch'], 'refs/heads/main')
+    inputs:
+      pollingTimeoutSec: '300'

@@ -1,0 +1,10 @@
+@use "./base" as *;
+@use "./mixins" as color-mixins;
+
+@include color-mixins.generate-color-variant("green", $green);
+@include color-mixins.generate-color-variant("blue", $blue);
+@include color-mixins.generate-color-variant("orange", $orange);
+@include color-mixins.generate-color-variant("red", $red);
+@include color-mixins.generate-color-variant("white", $white);
+@include color-mixins.generate-color-variant("off-white", $off-white);
+@include color-mixins.generate-color-variant("gray", $grey);

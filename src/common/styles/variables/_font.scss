@@ -1,0 +1,41 @@
+@use "abstracts/functions" as fn;
+
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+
+$font-family-base: "Inter", sans-serif;
+
+// Font weights
+$font-weight-normal: 400;
+$font-weight-medium: 500;
+$font-weight-semi-bold: 600;
+$font-weight-bold: 700;
+
+$font-13px: fn.toRem(13px);
+$font-14px: fn.toRem(14px);
+$font-16px: fn.toRem(16px);
+
+// Typography scale
+$font-h1-size: fn.toRem(32);
+$font-h1-line-height: 1.4;
+$font-h1-weight: $font-weight-bold;
+
+$font-h2-size: fn.toRem(22);
+$font-h2-line-height: 1.35;
+$font-h2-weight: $font-weight-semi-bold;
+
+$font-h3-size: $font-16px;
+$font-h3-line-height: 1.4;
+$font-h3-weight: $font-weight-medium;
+
+$font-paragraph-size: $font-14px;
+$font-paragraph-line-height: 1.6;
+
+$font-label-size: fn.toRem(13px);
+$font-label-line-height: 1.4;
+$font-label-weight: $font-weight-medium;
+
+$font-body-size: fn.toRem(10);
+$font-body-line-height: 1.4;
+$font-body-weight: $font-weight-normal;
+
+$icon-size: fn.toRem(16);

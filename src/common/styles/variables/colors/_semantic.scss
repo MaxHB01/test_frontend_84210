@@ -1,0 +1,11 @@
+@use "./base" as base;
+@use "./functions" as fn;
+
+$primary: base.$green;
+$secondary: base.$blue;
+$tertiary: base.$orange;
+$danger: base.$red;
+
+$text: base.$green;
+$background: base.$off-white;
+$surface: base.$white;

@@ -1,0 +1,51 @@
+@use "variables/colors" as colors;
+@use "variables/font" as font;
+
+html {
+	color: colors.$text;
+}
+
+h1 {
+	font-family: font.$font-family-base;
+	font-weight: font.$font-weight-normal;
+	font-size: font.$font-h1-size;
+	line-height: font.$font-h1-line-height;
+	font-weight: font.$font-h1-weight;
+}
+
+h2 {
+	font-family: font.$font-family-base;
+	font-weight: font.$font-weight-normal;
+	font-size: font.$font-h2-size;
+	line-height: font.$font-h2-line-height;
+	font-weight: font.$font-h2-weight;
+}
+
+h3 {
+	font-family: font.$font-family-base;
+	font-weight: font.$font-weight-normal;
+	font-size: font.$font-h3-size;
+	line-height: font.$font-h3-line-height;
+	font-weight: font.$font-h3-weight;
+}
+
+p {
+	font-family: font.$font-family-base;
+	font-weight: font.$font-weight-normal;
+	font-size: font.$font-paragraph-size;
+	line-height: font.$font-paragraph-line-height;
+}
+
+label {
+	font-family: font.$font-family-base;
+	font-weight: font.$font-label-weight;
+	font-size: font.$font-label-size;
+	line-height: font.$font-label-line-height;
+}
+
+body {
+	font-family: font.$font-family-base;
+	font-weight: font.$font-body-weight;
+	font-size: font.$font-body-size;
+	line-height: font.$font-body-line-height;
+}

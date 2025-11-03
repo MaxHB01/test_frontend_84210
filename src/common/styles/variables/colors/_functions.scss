@@ -1,0 +1,16 @@
+@use "sass:map";
+@use "./mixins" as *;
+
+@function get-color($name, $variant: base) {
+	$set: map.get($color-variants, $name);
+	@if $set == null {
+		@error 'No variants found for `#{$name}`.';
+	}
+
+	$value: map.get($set, $variant);
+	@if $value == null {
+		@error 'Variant `#{$variant}` not found for `#{$name}`.';
+	}
+
+	@return $value;
+}

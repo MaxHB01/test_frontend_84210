@@ -1,0 +1,19 @@
+@use "sass:math";
+@use "sass:meta";
+
+@function toRem($px, $base: 16) {
+	@if meta.type-of($px) != "number" {
+		@error 'toRem() expects a number. Got: #{meta.type-of($px)}';
+	}
+
+	@if $px == 0 {
+		@return 0;
+	}
+
+	// Strip px unit
+	@if not math.is-unitless($px) and math.compatible($px, 1px) {
+		$px: math.div($px, 1px);
+	}
+
+	@return math.div($px, $base) * 1rem;
+}

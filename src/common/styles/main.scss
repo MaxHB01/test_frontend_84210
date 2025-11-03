@@ -1,0 +1,22 @@
+@use "./base" as *;
+@use "./variables" as vars;
+@use "./layout" as *;
+
+:root {
+	--primary: #{vars.$primary};
+	--primary-foreground: #{vars.$white};
+
+	--secondary: #{vars.$secondary};
+	--secondary-foreground: #{vars.$white};
+
+	--tertiary: #{vars.$tertiary};
+	--tertiary-foreground: #{vars.$white};
+
+	--danger: #{vars.$danger};
+	--danger-foreground: #{vars.$white};
+
+	--text-color: #{vars.$text};
+
+	--background: #{vars.$background};
+	--surface: #{vars.$surface};
+}

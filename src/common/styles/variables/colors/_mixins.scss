@@ -1,0 +1,28 @@
+@use "sass:meta";
+@use "sass:map";
+@use "sass:color";
+
+$color-variants: () !default;
+
+@mixin generate-color-variant($name, $base-color) {
+	@if not(meta.type-of($base-color) == "color") {
+		@error 'Invalid base color: #{$base-color}';
+	}
+
+	$variants: (
+		base: $base-color,
+		light-25: color.mix(white, $base-color, 75%),
+		light-50: color.mix(white, $base-color, 50%),
+		light-75: color.mix(white, $base-color, 25%),
+		dark-25: color.mix(black, $base-color, 75%),
+		dark-50: color.mix(black, $base-color, 50%),
+		dark-75: color.mix(black, $base-color, 25%),
+	);
+
+	$color-variants: map.merge(
+		$color-variants,
+		(
+			$name: $variants,
+		)
+	) !global;
+}
