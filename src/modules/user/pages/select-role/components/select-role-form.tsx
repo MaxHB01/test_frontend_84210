@@ -12,7 +12,7 @@ import {
 } from "@/common/components/ui/select";
 import { Input } from "@/common/components/ui/input";
 import { Label } from "@/common/components/ui/label";
-import type { ReactElement } from "react";
+import type { FormEvent, ReactElement } from "react";
 
 export function SelectRoleForm(): ReactElement {
 	const {
@@ -20,12 +20,21 @@ export function SelectRoleForm(): ReactElement {
 		linkedinUrl,
 		canContinue,
 		isValidLinkedin,
+		isSubmitting,
+		submitError,
+		isSubmitted,
+		handleSubmit,
 		setSelectedRole,
 		setLinkedinUrl,
 	} = useSelectRoleForm();
 
+	const onSubmit = (event: FormEvent<HTMLFormElement>) => {
+		event.preventDefault();
+		void handleSubmit();
+	};
+
 	return (
-		<>
+		<form onSubmit={onSubmit} className="flex h-full flex-col">
 			<CardContent className="grid w-full items-center gap-4">
 				<SelectRoleSelector selectedRole={selectedRole} setSelectedRole={setSelectedRole} />
 
@@ -50,10 +59,18 @@ export function SelectRoleForm(): ReactElement {
 						)}
 					</div>
 				)}
+
+				{submitError && <p className="text-sm text-destructive">{submitError}</p>}
+
+				{isSubmitted && !submitError && (
+					<p className="text-sm text-muted-foreground">
+						Your role selection has been saved.
+					</p>
+				)}
 			</CardContent>
 
-			<SelectRoleFormButton canContinue={canContinue} />
-		</>
+			<SelectRoleFormButton canContinue={canContinue} isSubmitting={isSubmitting} />
+		</form>
 	);
 }
 
@@ -84,11 +101,17 @@ function SelectRoleSelector({
 	);
 }
 
-function SelectRoleFormButton({ canContinue }: { canContinue: boolean }) {
+function SelectRoleFormButton({
+	canContinue,
+	isSubmitting,
+}: {
+	canContinue: boolean;
+	isSubmitting: boolean;
+}) {
 	return (
 		<CardFooter>
-			<Button disabled={!canContinue} className="w-full">
-				Continue
+			<Button type="submit" disabled={!canContinue || isSubmitting} className="w-full">
+				{isSubmitting ? "Submitting..." : "Continue"}
 			</Button>
 		</CardFooter>
 	);
