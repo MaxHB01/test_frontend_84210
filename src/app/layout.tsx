@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import React, { type ReactNode } from "react";
 
+import { AppProviders } from "./providers";
+
 import "@/common/styles/globals.css";
 import "@/common/styles/main.scss";
 
@@ -16,7 +18,9 @@ export default function RootLayout({
 }>): React.JSX.Element {
 	return (
 		<html lang="en" suppressHydrationWarning>
-			<body className="bg-background text-foreground">{children}</body>
+			<body className="bg-background text-foreground">
+				<AppProviders>{children}</AppProviders>
+			</body>
 		</html>
 	);
 }
