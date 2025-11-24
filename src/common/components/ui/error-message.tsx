@@ -1,6 +1,8 @@
 import React from "react";
-import { cn } from "@/lib/utils";
+
 import { AlertCircle, AlertTriangle, Info } from "lucide-react";
+
+import { cn } from "@/lib/utils";
 
 interface ErrorMessageProps {
 	message: string;

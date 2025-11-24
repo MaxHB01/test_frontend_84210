@@ -1,7 +1,10 @@
-import RegisterForm from "./components/register-form";
-import styles from "./register.page.module.scss";
-import { Card, CardHeader } from "@/common/components/ui";
 import type { ReactElement } from "react";
+
+import { Card, CardHeader } from "@/common/components/ui";
+
+import RegisterForm from "./components/register-form";
+
+import styles from "./register.page.module.scss";
 
 export function RegisterPage(): ReactElement {
 	return (

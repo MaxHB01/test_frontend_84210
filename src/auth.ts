@@ -1,6 +1,9 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 
+import { apiClient } from "./lib";
+
+
 export const { handlers, signIn, signOut, auth } = NextAuth({
 	secret: process.env.NEXTAUTH_SECRET,
 	trustHost: true,
@@ -14,41 +17,31 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 			},
 			async authorize(credentials) {
 				try {
-					//It sends the credentials to the backend and returns the response
-					const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-
-					if (!apiUrl) {
-						throw new Error("API URL is not configured");
-					}
-
 					if (!credentials?.email || !credentials?.password) {
 						throw new Error("Email and password are required");
 					}
 
-					const res = await fetch(`${apiUrl}/login`, {
-						method: "POST",
-						headers: { "Content-Type": "application/json" },
-						body: JSON.stringify({
-							email: credentials.email,
-							password: credentials.password,
-						}),
+					const { status, data } = await apiClient.post("/login", {
+						email: credentials.email,
+						password: credentials.password,
 					});
 
-					if (!res.ok) {
-						throw new Error(`Authentication failed: ${res.status}`);
+					if (status !== 200) {
+						throw new Error(`Authentication failed: ${status}`);
 					}
 
-					//It parses the response as JSON
-					const user = await res.json();
+					if (!data || !data.accessToken) {
+						throw new Error("Invalid token response");
+					}
 
-					if (user.accessToken) {
+					if (data.accessToken) {
 						return {
 							id: credentials.email as string,
 							email: credentials.email as string,
-							tokenType: user.tokenType,
-							accessToken: user.accessToken,
-							refreshToken: user.refreshToken,
-							expiresIn: user.expiresIn,
+							tokenType: data.tokenType,
+							accessToken: data.accessToken,
+							refreshToken: data.refreshToken,
+							expiresIn: data.expiresIn,
 						};
 					}
 

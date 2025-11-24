@@ -1,18 +1,20 @@
 "use client";
 
-import { useSelectRoleForm } from "../hooks/select-role.hook";
-import { CardContent, CardFooter } from "@/common/components/ui/card";
+import type { ReactElement } from "react";
+
 import { Button } from "@/common/components/ui/button";
-import {
-	Select,
-	SelectTrigger,
-	SelectContent,
-	SelectItem,
-	SelectValue,
-} from "@/common/components/ui/select";
+import { CardContent, CardFooter } from "@/common/components/ui/card";
 import { Input } from "@/common/components/ui/input";
 import { Label } from "@/common/components/ui/label";
-import type { ReactElement } from "react";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/common/components/ui/select";
+
+import { useSelectRoleForm } from "../hooks/select-role.hook";
 
 export function SelectRoleForm(): ReactElement {
 	const {
@@ -22,10 +24,18 @@ export function SelectRoleForm(): ReactElement {
 		isValidLinkedin,
 		setSelectedRole,
 		setLinkedinUrl,
+		handleSubmit,
+		isSubmitting,
+		error,
 	} = useSelectRoleForm();
 
 	return (
-		<>
+		<form
+			onSubmit={event => {
+				void handleSubmit(event);
+			}}
+			className="contents"
+		>
 			<CardContent className="grid w-full items-center gap-4">
 				<SelectRoleSelector selectedRole={selectedRole} setSelectedRole={setSelectedRole} />
 
@@ -52,8 +62,12 @@ export function SelectRoleForm(): ReactElement {
 				)}
 			</CardContent>
 
-			<SelectRoleFormButton canContinue={canContinue} />
-		</>
+			<SelectRoleFormButton
+				canContinue={canContinue}
+				isSubmitting={isSubmitting}
+				error={error}
+			/>
+		</form>
 	);
 }
 
@@ -84,11 +98,20 @@ function SelectRoleSelector({
 	);
 }
 
-function SelectRoleFormButton({ canContinue }: { canContinue: boolean }) {
+function SelectRoleFormButton({
+	canContinue,
+	isSubmitting,
+	error,
+}: {
+	canContinue: boolean;
+	isSubmitting: boolean;
+	error: string | null;
+}) {
 	return (
-		<CardFooter>
-			<Button disabled={!canContinue} className="w-full">
-				Continue
+		<CardFooter className="flex flex-col gap-3">
+			{error && <p className="w-full text-sm text-destructive text-center">{error}</p>}
+			<Button type="submit" disabled={!canContinue || isSubmitting} className="w-full">
+				{isSubmitting ? "Saving..." : "Continue"}
 			</Button>
 		</CardFooter>
 	);

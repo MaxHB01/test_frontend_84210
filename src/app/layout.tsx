@@ -1,5 +1,6 @@
-import type { Metadata } from "next";
 import React, { type ReactNode } from "react";
+
+import type { Metadata } from "next";
 
 import "@/common/styles/globals.css";
 import "@/common/styles/main.scss";

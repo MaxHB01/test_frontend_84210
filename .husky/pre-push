@@ -1,0 +1,3 @@
+#!/usr/bin/env sh
+echo "Running full checks before push..."
+npm run check

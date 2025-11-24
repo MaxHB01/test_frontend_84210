@@ -1,9 +1,12 @@
 "use client";
 
 import * as React from "react";
-import { Input } from "./input";
-import { cn } from "@/lib/utils";
+
 import { Eye, EyeOff } from "lucide-react";
+
+import { cn } from "@/lib/utils";
+
+import { Input } from "./input";
 
 interface PasswordInputProps extends React.ComponentProps<"input"> {
 	showPassword?: boolean;

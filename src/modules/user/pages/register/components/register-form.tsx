@@ -1,8 +1,9 @@
 "use client";
-import { Button, CardContent, CardFooter } from "@/common/components/ui";
 import type { ReactElement } from "react";
-import { useRegisterForm } from "@/modules/user/pages/register/hooks/register.hook";
+
+import { Button, CardContent, CardFooter } from "@/common/components/ui";
 import { InputWithLabel } from "@/common/components/ui/input-with-label";
+import { useRegisterForm } from "@/modules/user/pages/register/hooks/register.hook";
 
 export default function RegisterForm(): ReactElement {
 	const {

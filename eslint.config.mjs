@@ -60,7 +60,6 @@ export default defineConfig([
     },
     rules: {
       // General stylistic rules
-      "indent": ["warn", "tab"],
       semi: ["error", "always"],
       quotes: [
         "warn",

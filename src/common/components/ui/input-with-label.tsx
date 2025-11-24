@@ -1,8 +1,10 @@
 import React, { type ReactElement } from "react";
-import { Label } from "@/common/components/ui/label";
-import { Input } from "@/common/components/ui/input";
-import { Button } from "@/common/components/ui/button";
+
 import { Eye, EyeOff } from "lucide-react";
+
+import { Button } from "@/common/components/ui/button";
+import { Input } from "@/common/components/ui/input";
+import { Label } from "@/common/components/ui/label";
 
 function InputWithLabel({
 	id,

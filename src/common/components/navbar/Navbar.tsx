@@ -1,6 +1,9 @@
 import React from "react";
+
 import Link from "next/link";
+
 import { Button } from "@/common/components/ui";
+
 import SignOutButton from "./SignOutButton";
 
 interface NavbarProps {

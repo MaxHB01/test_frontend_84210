@@ -1,5 +1,7 @@
 import React from "react";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/common/components/ui";
+
 import type { LoginCardProps } from "./interfaces";
 
 export function LoginCard({ children }: LoginCardProps): React.JSX.Element {

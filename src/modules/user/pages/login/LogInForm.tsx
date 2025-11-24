@@ -1,7 +1,8 @@
 "use client";
 import React, { useState } from "react";
-import { useLoginHandler } from "./hooks/use-login.hook";
+
 import { LoginCard, LoginFormContent } from "./components";
+import { useLoginHandler } from "./hooks/use-login.hook";
 
 export default function LogInForm(): React.JSX.Element {
 	const [showPassword, setShowPassword] = useState(false);

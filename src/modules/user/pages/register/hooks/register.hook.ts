@@ -1,4 +1,6 @@
-import { useMemo, useState, type FormEvent } from "react";
+import { type FormEvent, useMemo, useState } from "react";
+
+import { apiClient } from "@/lib";
 
 const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
@@ -41,15 +43,14 @@ export function useRegisterForm() {
 		setError("");
 
 		try {
-			const res = await fetch("/api/register", {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ firstName, lastName, email, password }),
+			const { status, data } = await apiClient.post("/user/register", {
+				firstName,
+				lastName,
+				email,
+				password,
 			});
 
-			const data = await res.json();
-
-			if (!res.ok) {
+			if (status !== 200) {
 				throw new Error(data.error || "Registration failed");
 			}
 

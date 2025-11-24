@@ -1,5 +1,7 @@
 import React from "react";
+
 import { Input, Label, PasswordInput } from "@/common/components/ui";
+
 import type { EmailFieldProps, PasswordFieldProps } from "./interfaces";
 
 export function EmailField({

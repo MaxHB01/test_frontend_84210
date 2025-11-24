@@ -1,0 +1,170 @@
+trigger:
+  branches:
+    include:
+      - main
+      - feature/*
+
+pr:
+  none
+
+variables:
+  # Infrastructure variables
+  azureSubscription: 'rg-se-vt-s7-group1'
+  tier: 'Basic'
+  stockKeepingUnitPlan: 'B1'
+  location: 'westeurope'
+  resourceGroup: 'rg-se-vt-s7-group1'
+  bicepFile: 'infrastructure/main.bicep'
+
+  # app / subdomain names
+  productionApp: 'growpath'
+  developmentApp: 'growpath-dev'
+
+  # Building variables
+  nodeVersion: '20'
+  artifactName: 'webpkg'
+  archiveName: 'next.zip'
+  startupCommand: 'node server.js'
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+stages:
+
+  # Creating servers and resources.
+  - stage: SetupInfrastructure
+    displayName: 'Configuring infrastructure'
+    jobs:
+      - job: bicep
+        steps:
+
+          # Task to check if the resource group exist in azure, if not create the resource group.
+          - task: AzureCLI@2
+            displayName: 'Creating Resource Group'
+            inputs:
+              azureSubscription: '$(azureSubscription)'
+              scriptType: bash
+              scriptLocation: inlineScript
+              inlineScript: |
+                az group create -n $(resourceGroup) -l $(location)
+          
+          # Use the bicep file to deploy the infrastructure for the app.
+          - task: AzureCLI@2
+            displayName: 'Deploying Infrastructure'
+            inputs:
+              azureSubscription: '$(azureSubscription)'
+              scriptType: bash
+              scriptLocation: inlineScript
+              inlineScript: |
+                az deployment group create \
+                --resource-group $(resourceGroup) \
+                --template-file $(bicepFile) \
+                --parameters \
+                    location=$(location) \
+                    appName=$(productionApp) \
+                    tier=$(tier) \
+                    stockKeepingUnitPlan=$(stockKeepingUnitPlan) \
+                    nodeVersion=$(nodeVersion)
+
+  # Building the application and publish a package
+  - stage: Build
+    displayName: 'Build Next.js Application'
+    dependsOn: SetupInfrastructure
+    jobs:
+      - job: BuildNextJob
+        displayName: "Build Next.js Application"
+        steps:
+          - task: NodeTool@0
+            displayName: 'Use Node $(nodeVersion)'
+            inputs:
+              versionSpec: '$(nodeVersion)'
+
+          - script: |
+              chmod +x ./scripts/build.sh
+              ./scripts/build.sh
+            displayName: 'Install dependencies and build project'
+
+          - script: |
+              chmod +x ./scripts/package.sh
+              ./scripts/package.sh
+            displayName: 'Packaging build and dependencies'
+
+          # Create the zip file with the build output
+          - task: ArchiveFiles@2
+            displayName: 'Creating ZIP'
+            inputs:
+              rootFolderOrFile: 'package'
+              includeRootFolder: false
+              archiveType: 'zip'
+              archiveFile: '$(Build.ArtifactStagingDirectory)/$(archiveName)'
+              replaceExistingArchive: true
+
+          # Publish artifact
+          - publish: $(Build.ArtifactStagingDirectory)/$(archiveName)
+            artifact: $(artifactName)
+
+  # Deploy app to Development Environment
+  - stage: DeployToDev
+    displayName: 'Deploy artifact to Development Environment'
+    dependsOn:
+      - SetupInfrastructure
+      - Build
+    
+    # Check if the current branch is main and deploy to development environment
+    condition: eq(variables['Build.SourceBranchName'], 'main')
+    jobs:
+      - job: DeployToDevJob
+        displayName: "Deploy to Development"
+        steps:
+          - download: current
+            artifact: $(artifactName)
+            displayName: "Download the artifact"
+          
+          - task: AzureWebApp@1
+            displayName: "Start Next.js Application"
+            inputs:
+              azureSubscription: $(azureSubscription)
+              appName: $(developmentApp)
+              package: '$(Pipeline.Workspace)/$(artifactName)/$(archiveName)'
+              appType: 'webAppLinux'
+              resourceGroupName: $(resourceGroup)
+              StartupCommand: '$(startupCommand)'
+          
+  
+  # Deploy app to Production Environment
+  - stage: DeployToProd
+    displayName: "Deploy artifact to Production Environment"
+    dependsOn:
+      - SetupInfrastructure
+      - Build
+  
+    
+    # Check if the current branch is main and deploy it to production environment
+    condition: eq(variables['Build.SourceBranchName'], 'main')
+    jobs:
+      - deployment: DeployToProdJob
+        displayName: "Deploy to Production"
+        environment: 'production'
+
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - download: current
+                  artifact: $(artifactName)
+            
+                - task: AzureWebApp@1
+                  displayName: "Deploy to $(productionApp)"
+                  inputs:
+                    azureSubscription: $(azureSubscription)
+                    appName: $(productionApp)
+                    package: '$(Pipeline.Workspace)/$(artifactName)/$(archiveName)'
+                    appType: 'webAppLinux'
+                    resourceGroupName: $(resourceGroup)
+                    StartupCommand: '$(startupCommand)'
+
+                
+
+
+
+

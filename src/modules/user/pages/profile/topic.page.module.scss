@@ -1,0 +1,10 @@
+@use "abstracts/functions" as fn;
+
+.wrapper {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	height: 100dvh;
+	width: 100dvw;
+}

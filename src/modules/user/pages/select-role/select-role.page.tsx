@@ -1,7 +1,10 @@
 import type { ReactElement } from "react";
-import styles from "./select-role.page.module.scss";
-import { SelectRoleForm } from "./components/select-role-form";
+
 import { Card, CardHeader } from "@/common/components/ui";
+
+import { SelectRoleForm } from "./components/select-role-form";
+
+import styles from "./select-role.page.module.scss";
 
 export function SelectRolePage(): ReactElement {
 	return (
