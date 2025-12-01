@@ -6,7 +6,7 @@ import { apiClient } from "@/lib";
 import type { MentorDto } from "./dtos.types";
 
 export async function getMentors(topic?: string): Promise<Mentor[]> {
-	var { status, data } = await apiClient.get<MentorDto[]>("/mentors/search", {
+	var { status, data } = await apiClient.get<MentorDto[]>("/mentors", {
 		params: {
 			topic,
 		},
@@ -16,7 +16,7 @@ export async function getMentors(topic?: string): Promise<Mentor[]> {
 		return [];
 	}
 
-	// TODO add rating and topics here.
+	// TODO add rating here
 	return data.map(
 		dto =>
 			({
@@ -25,7 +25,8 @@ export async function getMentors(topic?: string): Promise<Mentor[]> {
 				lastName: dto.lastName,
 				bio: dto.biography,
 				rating: 0,
-				topics: [],
+				topics: dto.topics,
+				linkedInProfileUrl: dto.linkedInProfileUrl,
 			}) as Mentor
 	);
 }

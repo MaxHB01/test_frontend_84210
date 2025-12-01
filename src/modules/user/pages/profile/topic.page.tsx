@@ -22,9 +22,7 @@ export function TopicPage(): ReactElement {
 			<Card className="overflow-visible relative w-[350px]">
 				<CardHeader>
 					<h1 className="text-2xl font-bold text-foreground">Manage Topics</h1>
-					<p className="text-muted-foreground">
-						Add or remove topics from your profile.
-					</p>
+					<p className="text-muted-foreground">Add or remove topics from your profile.</p>
 				</CardHeader>
 				<TopicForm
 					existingTopics={existingTopics}
@@ -35,4 +33,3 @@ export function TopicPage(): ReactElement {
 		</div>
 	);
 }
-

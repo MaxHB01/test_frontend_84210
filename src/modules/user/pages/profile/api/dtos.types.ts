@@ -1,8 +1,6 @@
-export interface MentorDto {
-	id: string;
+export type MentorDto = {
 	firstName: string;
 	lastName: string;
 	biography: string;
 	linkedInProfileUrl: string;
-	topics: string[];
-}
+};

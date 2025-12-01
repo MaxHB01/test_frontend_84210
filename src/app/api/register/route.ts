@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { apiClient } from "@/lib";
 
+import { apiClient } from "@/lib";
 
 export async function POST(req: Request) {
 	try {

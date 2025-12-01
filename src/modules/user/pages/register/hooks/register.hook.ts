@@ -1,6 +1,6 @@
 import { type FormEvent, useMemo, useState } from "react";
 
-import { apiClient } from "@/lib";
+import { registerUserAction } from "../api/actions";
 
 const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
@@ -43,15 +43,15 @@ export function useRegisterForm() {
 		setError("");
 
 		try {
-			const { status, data } = await apiClient.post("/user/register", {
+			const result = await registerUserAction({
 				firstName,
 				lastName,
 				email,
 				password,
 			});
 
-			if (status !== 200) {
-				throw new Error(data.error || "Registration failed");
+			if (!result.success) {
+				throw new Error(result.message);
 			}
 
 			// Success - redirect to login or dashboard

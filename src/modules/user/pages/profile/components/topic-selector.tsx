@@ -1,8 +1,7 @@
 "use client";
 
-import { useState, useMemo, type ReactElement } from "react";
+import { type ReactElement, useMemo, useState } from "react";
 
-import { Label } from "@/common/components/ui/label";
 import {
 	Command,
 	CommandEmpty,
@@ -11,6 +10,7 @@ import {
 	CommandItem,
 	CommandList,
 } from "@/common/components/ui/command";
+import { Label } from "@/common/components/ui/label";
 
 type TopicSelectorProps = {
 	topicValue: string;
@@ -28,18 +28,14 @@ export function TopicSelector({
 	const [open, setOpen] = useState(false);
 
 	const filteredSuggestions = useMemo(() => {
-		const available = suggestedTopics.filter(
-			topic => !existingTopics.includes(topic)
-		);
+		const available = suggestedTopics.filter(topic => !existingTopics.includes(topic));
 
 		if (!topicValue.trim()) {
 			return available;
 		}
 
 		const searchLower = topicValue.toLowerCase();
-		return available.filter(topic =>
-			topic.toLowerCase().includes(searchLower)
-		);
+		return available.filter(topic => topic.toLowerCase().includes(searchLower));
 	}, [suggestedTopics, existingTopics, topicValue]);
 
 	const isDuplicate = existingTopics.includes(topicValue.trim());
@@ -50,9 +46,7 @@ export function TopicSelector({
 			<div className="relative w-full">
 				<Command
 					className={`rounded-lg border shadow-sm focus-within:ring-0 focus-within:outline-none ${
-						isDuplicate && topicValue.trim().length > 0
-							? "border-destructive"
-							: ""
+						isDuplicate && topicValue.trim().length > 0 ? "border-destructive" : ""
 					} [&_[data-slot=command-input-wrapper]]:focus-within:border-0 [&_[data-slot=command-input-wrapper]]:focus-within:border-none`}
 				>
 					<CommandInput
@@ -72,7 +66,7 @@ export function TopicSelector({
 					{open && filteredSuggestions.length > 0 && (
 						<CommandList className="absolute w-full left-0 top-full mt-1 bg-white border rounded-lg shadow-lg z-10 max-h-[200px]">
 							<CommandGroup heading="Suggestions">
-								{filteredSuggestions.map((suggestion) => (
+								{filteredSuggestions.map(suggestion => (
 									<CommandItem
 										key={suggestion}
 										value={suggestion}
@@ -97,11 +91,8 @@ export function TopicSelector({
 				</Command>
 			</div>
 			{isDuplicate && topicValue.trim().length > 0 && (
-				<p className="text-sm text-destructive">
-					This topic is already added.
-				</p>
+				<p className="text-sm text-destructive">This topic is already added.</p>
 			)}
 		</div>
 	);
 }
-

@@ -23,6 +23,7 @@
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
+    "types": ["next-auth"],
     "plugins": [
       {
         "name": "next"
@@ -33,6 +34,7 @@
         "./src/*"
       ]
     }
+    
   },
   "include": [
     "**/*.ts",

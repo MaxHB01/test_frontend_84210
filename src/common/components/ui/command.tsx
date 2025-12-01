@@ -73,7 +73,8 @@ function CommandInput({
 			className={cn(
 				"flex h-9 items-center gap-2 px-3",
 				!hideBorder && "border-b",
-				hideBorder && "border-0 border-none focus:border-0 focus:border-none focus-visible:border-0 focus-visible:border-none"
+				hideBorder &&
+					"border-0 border-none focus:border-0 focus:border-none focus-visible:border-0 focus-visible:border-none"
 			)}
 			style={hideBorder ? { border: "none", outline: "none" } : undefined}
 		>

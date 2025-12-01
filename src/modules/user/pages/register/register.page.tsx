@@ -1,4 +1,6 @@
-import type { ReactElement } from "react";
+"use server";
+
+import React from "react";
 
 import { Card, CardHeader } from "@/common/components/ui";
 
@@ -6,7 +8,8 @@ import RegisterForm from "./components/register-form";
 
 import styles from "./register.page.module.scss";
 
-export function RegisterPage(): ReactElement {
+// eslint-disable-next-line @typescript-eslint/require-await
+export async function RegisterPage(): Promise<React.JSX.Element> {
 	return (
 		<div className={styles.wrapper}>
 			<Card className="overflow-visible relative w-[450px]">

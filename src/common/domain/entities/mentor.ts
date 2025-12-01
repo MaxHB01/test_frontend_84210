@@ -5,4 +5,5 @@ export type Mentor = {
 	bio: string;
 	topics: string[];
 	rating: number;
+	linkedInProfileUrl: string;
 };

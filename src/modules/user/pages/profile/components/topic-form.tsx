@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, type ReactElement } from "react";
-
+import { type ReactElement, useEffect, useMemo, useState } from "react";
 
 import { X } from "lucide-react";
 
@@ -9,7 +8,7 @@ import { Button } from "@/common/components/ui/button";
 import { CardContent, CardFooter } from "@/common/components/ui/card";
 
 import { TopicSelector } from "./topic-selector";
-	
+
 type TopicFormProps = {
 	suggestedTopics?: string[];
 	existingTopics?: string[];
@@ -66,7 +65,9 @@ export function TopicForm({
 									variant="ghost"
 									size="icon-sm"
 									onClick={() => {
-										const updatedTopics = existingTopics.filter(t => t !== topic);
+										const updatedTopics = existingTopics.filter(
+											t => t !== topic
+										);
 										handleSetExistingTopics(updatedTopics);
 									}}
 									className="ml-1 h-auto w-auto p-0.5 hover:bg-foreground/10"
@@ -98,4 +99,3 @@ export function TopicForm({
 		</form>
 	);
 }
-
