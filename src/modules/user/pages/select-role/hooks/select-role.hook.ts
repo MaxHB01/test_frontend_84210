@@ -2,10 +2,13 @@ import { type FormEvent, useMemo, useState } from "react";
 
 import { useRouter } from "next/navigation";
 
+import { selectRole } from "../api/actions";
+
 const linkedinRegex = /^(https?:\/\/)?(www\.)?linkedin\.com\/(in|company)\/[a-zA-Z0-9-_/?=]+\/?$/i;
 
 export function useSelectRoleForm() {
 	const router = useRouter();
+
 	const [selectedRole, setSelectedRole] = useState<"mentor" | "student" | undefined>(undefined);
 	const [linkedinUrl, setLinkedinUrl] = useState("");
 	const [isSubmitting, setIsSubmitting] = useState(false);
@@ -33,19 +36,13 @@ export function useSelectRoleForm() {
 		setError(null);
 
 		try {
-			const response = await fetch("/user/role-select", {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({
-					role: selectedRole,
-					linkedInProfileUrl: linkedinUrl.trim(),
-				}),
+			const status = await selectRole({
+				role: selectedRole,
+				linkedInProfileUrl: linkedinUrl,
 			});
 
-			if (!response.ok) {
-				const data = await response.json().catch(() => ({}));
-				const message = data.error ?? data.message ?? "Failed to save role";
-				setError(message);
+			if (status < 200 || status > 204) {
+				setError("Failed to save role");
 				return;
 			}
 

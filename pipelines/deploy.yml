@@ -7,11 +7,18 @@ trigger:
 pr:
   none
 
+parameters:
+  - name: deployKeyVaults
+    type: boolean
+    default: false
+    displayName: Deploy Key Vaults?
+
 variables:
   # Infrastructure variables
   azureSubscription: 'rg-se-vt-s7-group1'
   tier: 'Basic'
   stockKeepingUnitPlan: 'B1'
+  deployKeyVaults: ${{ parameters.deployKeyVaults }}
   location: 'westeurope'
   resourceGroup: 'rg-se-vt-s7-group1'
   bicepFile: 'infrastructure/main.bicep'
@@ -64,6 +71,7 @@ stages:
                     appName=$(productionApp) \
                     tier=$(tier) \
                     stockKeepingUnitPlan=$(stockKeepingUnitPlan) \
+                    deployKeyVaults=$(deployKeyVaults) \
                     nodeVersion=$(nodeVersion)
 
   # Building the application and publish a package
@@ -110,8 +118,6 @@ stages:
       - SetupInfrastructure
       - Build
     
-    # Check if the current branch is main and deploy to development environment
-    condition: eq(variables['Build.SourceBranchName'], 'main')
     jobs:
       - job: DeployToDevJob
         displayName: "Deploy to Development"

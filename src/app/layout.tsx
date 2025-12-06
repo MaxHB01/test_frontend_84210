@@ -5,6 +5,8 @@ import type { Metadata } from "next";
 import "@/common/styles/globals.css";
 import "@/common/styles/main.scss";
 
+import { ChatProvider } from "@/common/components/chat/chat-provider";
+
 export const metadata: Metadata = {
 	title: "GrowPath",
 	description: "The next big thing in the world of education",
@@ -17,7 +19,10 @@ export default function RootLayout({
 }>): React.JSX.Element {
 	return (
 		<html lang="en" suppressHydrationWarning>
-			<body className="bg-background text-foreground">{children}</body>
+			<body className="bg-background text-foreground">
+				{children}
+				<ChatProvider />
+			</body>
 		</html>
 	);
 }

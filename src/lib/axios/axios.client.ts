@@ -1,12 +1,11 @@
-"use server";
-
 import axios from "axios";
 
-import { auth, signOut } from "@/auth";
+import { auth } from "@/auth";
 import { Environment } from "@/common/config/environment";
-import { logger } from "@/lib/logger";
 
-const apiClient = axios.create({
+import { logger } from "../logger";
+
+export const apiClient = axios.create({
 	baseURL: Environment.API_URL,
 	timeout: Environment.TIMEOUT,
 	headers: { "Content-Type": "application/json" },
@@ -16,12 +15,15 @@ const apiClient = axios.create({
 apiClient.interceptors.request.use(
 	async config => {
 		logger.info("API Request to: " + config.url);
-		const session = await auth();
-		const token = session?.user?.accessToken;
 
-		if (token) {
-			config.headers = config.headers ?? {};
-			config.headers.Authorization = `Bearer ${token}`;
+		if (config.url?.includes("/auth/refresh")) {
+			return config;
+		}
+
+		const session = await auth();
+
+		if (session?.accessToken) {
+			config.headers.Authorization = `Bearer ${session.accessToken}`;
 		}
 
 		return config;
@@ -42,14 +44,6 @@ apiClient.interceptors.response.use(
 			code: error.code,
 		});
 
-		// Handle unauthorized → force logout
-		if (status === 401) {
-			logger.warn("401 detected — signing out user");
-			await signOut({ redirectTo: "/login" });
-		}
-
 		return Promise.reject(error);
 	}
 );
-
-export { apiClient };

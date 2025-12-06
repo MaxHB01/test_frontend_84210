@@ -16,6 +16,9 @@ param stockKeepingUnitPlan string = 'B1'
 @allowed(['18', '20', '22'])
 param nodeVersion string = '20'
 
+@description('Whether to deploy Key Vault resources')
+param deployKeyVaults bool = false
+
 // ----------------------------------------------------------------------
 // 1. APP SERVICE PLAN MODULE
 // ----------------------------------------------------------------------
@@ -34,8 +37,8 @@ module serverPlan './modules/server-plan.bicep' = {
 // ----------------------------------------------------------------------
 
 
-var keyVaultProductionName = '${appName}-kv-prod'
-module keyVaultProduction './modules/key-vault/vault.bicep' = {
+var keyVaultProductionName = '${appName}-kv-prod-v2'
+module keyVaultProduction './modules/key-vault/vault.bicep' = if (deployKeyVaults) {
     name: '${keyVaultProductionName}-module'
     params: {
         location: location
@@ -43,7 +46,7 @@ module keyVaultProduction './modules/key-vault/vault.bicep' = {
     }
 }
 
-module secretsProduction './modules/key-vault/secrets.bicep' = {
+module secretsProduction './modules/key-vault/secrets.bicep' = if (deployKeyVaults) {
     name: '${keyVaultProductionName}-secrets-module'
     dependsOn: [
         keyVaultProduction
@@ -53,8 +56,8 @@ module secretsProduction './modules/key-vault/secrets.bicep' = {
     }
 }
 
-var keyVaultDevelopmentName = '${appName}-kv-dev'
-module keyVaultDevelopment './modules/key-vault/vault.bicep' = {
+var keyVaultDevelopmentName = '${appName}-kv-dev-v2'
+module keyVaultDevelopment './modules/key-vault/vault.bicep' = if (deployKeyVaults) {
     name: '${keyVaultDevelopmentName}-module'
     params: {
         location: location
@@ -62,7 +65,7 @@ module keyVaultDevelopment './modules/key-vault/vault.bicep' = {
     }
 }
 
-module secretsDevelopment './modules/key-vault/secrets.bicep' = {
+module secretsDevelopment './modules/key-vault/secrets.bicep' = if (deployKeyVaults) {
     name: '${keyVaultDevelopmentName}-secrets-module'
     dependsOn: [
         keyVaultDevelopment
@@ -71,6 +74,58 @@ module secretsDevelopment './modules/key-vault/secrets.bicep' = {
         vaultName: keyVaultDevelopmentName
     }
 }
+
+//
+//development existing vaults
+//
+resource keyVaultDevelopmentExisting 'Microsoft.KeyVault/vaults@2025-05-01' existing = if (!deployKeyVaults) {
+  name: keyVaultDevelopmentName
+}
+
+resource authSecretDev 'Microsoft.KeyVault/vaults/secrets@2025-05-01' existing = if (!deployKeyVaults) {
+  parent: keyVaultDevelopmentExisting
+  name: 'AUTH-SECRET'
+}
+
+resource apiUrlSecretDev 'Microsoft.KeyVault/vaults/secrets@2025-05-01' existing = if (!deployKeyVaults) {
+  parent: keyVaultDevelopmentExisting
+  name: 'API-URL'
+}
+
+// Get secret URI for output
+var authSecretUriDev = deployKeyVaults
+  ? secretsDevelopment.outputs.authSecretUri   // From module output if deployed
+  : authSecretDev.properties.secretUriWithVersion // From existing reference
+  
+var apiUrlSecretUriDev = deployKeyVaults
+  ? secretsDevelopment.outputs.apiUrlSecretUri   // From module output if deployed
+  : apiUrlSecretDev.properties.secretUriWithVersion // From existing reference
+  
+//
+//production existing vaults
+//
+resource keyVaultProductionExisting 'Microsoft.KeyVault/vaults@2025-05-01' existing = if (!deployKeyVaults) {
+  name: keyVaultProductionName
+}
+
+resource authSecretProd 'Microsoft.KeyVault/vaults/secrets@2025-05-01' existing = if (!deployKeyVaults) {
+  parent: keyVaultProductionExisting
+  name: 'AUTH-SECRET'
+}
+
+resource apiUrlSecretProd 'Microsoft.KeyVault/vaults/secrets@2025-05-01' existing = if (!deployKeyVaults) {
+  parent: keyVaultProductionExisting
+  name: 'API-URL'
+}
+
+// Get secret URI for output
+var authSecretUriProd = deployKeyVaults
+  ? secretsProduction.outputs.authSecretUri   // From module output if deployed
+  : authSecretProd.properties.secretUriWithVersion // From existing reference
+  
+var apiUrlSecretUriProd = deployKeyVaults
+  ? secretsProduction.outputs.apiUrlSecretUri   // From module output if deployed
+  : apiUrlSecretProd.properties.secretUriWithVersion // From existing reference
 
 // ----------------------------------------------------------------------
 // 4. NEXT.JS WEB APPS
@@ -87,8 +142,8 @@ module production './modules/next-app.bicep' = {
         nodeVersion: nodeVersion
         port: 8080
 
-        authSecretUri: secretsProduction.outputs.authSecretUri
-        apiUrlSecretUri: secretsProduction.outputs.apiUrlSecretUri
+        authSecretUri: authSecretUriProd
+        apiUrlSecretUri: apiUrlSecretUriProd
     }
 }
 
@@ -106,7 +161,7 @@ module productionAccessPolicy './modules/key-vault/access-policy.bicep' = {
 module development './modules/next-app.bicep' = {
     name: '${appName}-development-module'
     dependsOn: [
-        keyVaultDevelopment
+        keyVaultDevelopmentExisting
     ]
     params: {
         location: location
@@ -115,15 +170,15 @@ module development './modules/next-app.bicep' = {
         nodeVersion: nodeVersion
         port: 8080
 
-        authSecretUri: secretsDevelopment.outputs.authSecretUri
-        apiUrlSecretUri: secretsDevelopment.outputs.apiUrlSecretUri
+        authSecretUri: authSecretUriDev
+        apiUrlSecretUri: apiUrlSecretUriDev
     }
 }
 
 module developmentAccessPolicy './modules/key-vault/access-policy.bicep' = {
     name: '${keyVaultDevelopmentName}-access-policy-module'
     dependsOn: [
-        keyVaultDevelopment
+        keyVaultDevelopmentExisting
     ]
     params: {
         vaultName: keyVaultDevelopmentName

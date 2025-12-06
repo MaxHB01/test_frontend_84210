@@ -55,7 +55,7 @@ export function useRegisterForm() {
 			}
 
 			// Success - redirect to login or dashboard
-			window.location.href = "/login";
+			window.location.href = "/auth/login";
 		} catch (e: unknown) {
 			if (e instanceof Error) {
 				setError(e.message);

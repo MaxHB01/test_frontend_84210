@@ -20,7 +20,7 @@ export async function getMentors(topic?: string): Promise<Mentor[]> {
 	return data.map(
 		dto =>
 			({
-				id: dto.id,
+				id: dto.userId,
 				firstName: dto.firstName,
 				lastName: dto.lastName,
 				bio: dto.biography,

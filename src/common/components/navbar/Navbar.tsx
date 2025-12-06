@@ -4,11 +4,12 @@ import Link from "next/link";
 
 import { Button } from "@/common/components/ui";
 
-import SignOutButton from "./SignOutButton";
+import UserMenu from "./components/UserMenu";
 
 interface NavbarProps {
 	session?: {
 		user?: {
+			id?: string;
 			email?: string;
 		};
 	} | null;
@@ -24,20 +25,15 @@ export default function Navbar({ session }: NavbarProps): React.JSX.Element {
 					</div>
 					<div className="flex items-center space-x-4">
 						{session ? (
-							<div className="flex items-center space-x-4">
-								<span className="text-sm text-gray-600">
-									Welcome, {session.user?.email}
-								</span>
-								<SignOutButton />
-							</div>
+							<UserMenu userId={session.user?.id} userEmail={session.user?.email} />
 						) : (
 							<>
-								<Link href="/login">
+								<Link href="/auth/login">
 									<Button variant={"default"} size={"lg"}>
 										Sign In
 									</Button>
 								</Link>
-								<Link href="/register">
+								<Link href="/auth/register">
 									<Button variant={"outline"} size={"lg"}>
 										Sign Up
 									</Button>

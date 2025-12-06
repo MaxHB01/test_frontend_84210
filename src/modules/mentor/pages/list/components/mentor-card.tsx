@@ -1,6 +1,9 @@
+"use client";
+
 import React from "react";
 
 import { Star } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 import {
 	Button,
@@ -12,22 +15,19 @@ import {
 	CardTitle,
 } from "@/common/components/ui";
 import type { Mentor } from "@/common/domain/entities/mentor";
+import { getInitials } from "@/lib/utils";
 
 type MentorCardProps = {
 	mentor: Mentor;
-	onProfileClick?: () => void;
 };
 
-function getInitials(name: string): string {
-	const words = name.trim().split(/\s+/);
-	if (words.length === 0) return "";
-	if (words.length === 1) return words[0][0]?.toUpperCase() || "";
-	const firstName = words[0];
-	const lastName = words[words.length - 1];
-	return `${firstName[0]?.toUpperCase() || ""}${lastName[0]?.toUpperCase() || ""}`;
-}
+export function MentorCard({ mentor }: MentorCardProps): React.JSX.Element {
+	const router = useRouter();
 
-export function MentorCard({ mentor, onProfileClick }: MentorCardProps): React.JSX.Element {
+	function goToProfilePage() {
+		void router.push("/profile/" + mentor.id);
+	}
+
 	return (
 		<Card className="h-full rounded-xl border-2 border-[#ececec]">
 			<CardHeader className="text-left">
@@ -59,7 +59,7 @@ export function MentorCard({ mentor, onProfileClick }: MentorCardProps): React.J
 				</div>
 			</CardContent>
 			<CardFooter className="mt-auto">
-				<Button onClick={onProfileClick} size="sm">
+				<Button onClick={goToProfilePage} size="sm">
 					See profile
 				</Button>
 			</CardFooter>

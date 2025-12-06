@@ -1,5 +1,5 @@
 export interface MentorDto {
-	id: string;
+	userId: string;
 	firstName: string;
 	lastName: string;
 	biography: string;

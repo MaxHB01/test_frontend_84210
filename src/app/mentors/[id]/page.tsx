@@ -1,6 +1,6 @@
-import { ProfilePage } from "@/modules/user/pages/profile/profile.page";
+import { MentorProfilePage } from "@/modules/mentor/pages";
 
 export default async function Page({ params }: { params: { id: string } }) {
 	const { id } = await params;
-	return <ProfilePage id={id} />;
+	return <MentorProfilePage id={id} />;
 }
