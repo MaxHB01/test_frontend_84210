@@ -29,16 +29,16 @@ interface ChatWindowProps {
 }
 
 export function ChatWindow({
-chat,
-messages,
-onBack,
-currentUserId,
-isLoading = false,
-error = null,
-onSendMessage,
-isSending = false,
-sendError = null,
-}: ChatWindowProps): ReactElement {
+                               chat,
+                               messages,
+                               onBack,
+                               currentUserId,
+                               isLoading = false,
+                               error = null,
+                               onSendMessage,
+                               isSending = false,
+                               sendError = null,
+                           }: ChatWindowProps): ReactElement {
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const [messageText, setMessageText] = useState("");
 
@@ -66,6 +66,10 @@ sendError = null,
         } catch {
             // Error is handled by parent state
         }
+    };
+
+    const handleSubmitSafe = (event: FormEvent | MouseEvent) => {
+        void handleSubmit(event);
     };
 
     const renderMessage = (message: ChatMessage) => {
@@ -130,7 +134,7 @@ sendError = null,
             </div>
 
             <div className={styles.messageInputBar} aria-label="Message input area">
-                <form className={styles.messageForm} onSubmit={handleSubmit}>
+                <form className={styles.messageForm} onSubmit={handleSubmitSafe}>
                     <input
                         type="text"
                         className={styles.messageInput}
@@ -149,7 +153,7 @@ sendError = null,
                             ? styles.sendButtonEnabled
                             : styles.sendButtonDisabled
                     }`}
-                    onClick={handleSubmit}
+                    onClick={handleSubmitSafe}
                     disabled={!messageText.trim() || isSending || !onSendMessage}
                 >
                     {isSending ? "Sending..." : "Send"}
