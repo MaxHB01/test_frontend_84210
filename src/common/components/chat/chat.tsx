@@ -19,7 +19,7 @@ export function Chat({
 	unreadCount = 0,
 	onChatClick,
 	isLoading = false,
-    currentUserId = null,
+    currentUserId,
 }: ChatProps): ReactElement {
 	const [isOpen, setIsOpen] = useState(false);
     const [selectedChat, setSelectedChat] = useState<ChatListItem | null>(null);
@@ -113,4 +113,3 @@ export function Chat({
 		</>
 	);
 }
-
