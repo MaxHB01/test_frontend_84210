@@ -50,7 +50,7 @@ export function Chat({
         setMessages([]);
 
         try {
-            const response = await fetch(`api/chat/${chatId}/messages`);
+            const response = await fetch(`/api/chatMessages/${chatId}`);
 
             if (!response.ok) {
                 throw new Error("Failed to load messages");
