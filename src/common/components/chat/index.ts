@@ -6,7 +6,6 @@ export type { ChatButtonProps } from "./button/chat-button";
 export { ChatList } from "./list/chat-list";
 export { ChatListItemComponent } from "./list/chat-list-item";
 export { ChatListDialog } from "./dialog/chat-list-dialog";
-export type { ChatApiResponse, ChatListItem } from "./types";
+export type { ChatApiResponse, ChatListItem, ChatMessage } from "./types";
 export * from "./utils";
 export { getChatsAction } from "./api/actions";
-

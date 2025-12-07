@@ -1,18 +1,16 @@
 "use client";
 
 import type { ReactElement } from "react";
+
+import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { X } from "lucide-react";
 
-import {
-	Dialog,
-	DialogHeader,
-	DialogTitle,
-	DialogPortal,
-} from "@/common/components/ui/dialog";
-import * as DialogPrimitive from "@radix-ui/react-dialog";
+import { Dialog, DialogHeader, DialogPortal, DialogTitle } from "@/common/components/ui/dialog";
 
-import type { ChatListItem } from "../types";
 import { ChatList } from "../list/chat-list";
+import type { ChatListItem, ChatMessage } from "../types";
+import { ChatWindow } from "../window/chat-window";
+
 import styles from "./chat-list-dialog.module.scss";
 
 interface ChatListDialogProps {
@@ -21,6 +19,12 @@ interface ChatListDialogProps {
 	chats: ChatListItem[];
 	onChatClick?: (chat: ChatListItem) => void;
 	isLoading?: boolean;
+	selectedChat?: ChatListItem | null;
+	onBackToList?: () => void;
+	messages?: ChatMessage[];
+	isMessagesLoading?: boolean;
+	messagesError?: string | null;
+	currentUserId?: string | null;
 }
 
 export function ChatListDialog({
@@ -29,7 +33,15 @@ export function ChatListDialog({
 	chats,
 	onChatClick,
 	isLoading = false,
+	selectedChat,
+	onBackToList,
+	messages = [],
+	isMessagesLoading = false,
+	messagesError = null,
+	currentUserId,
 }: ChatListDialogProps): ReactElement {
+	const isViewingChat = Boolean(selectedChat);
+
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
 			<DialogPortal>
@@ -40,11 +52,32 @@ export function ChatListDialog({
 						onOpenChange(false);
 					}}
 				>
-					<DialogHeader className={styles.dialogHeader}>
-						<DialogTitle className={styles.dialogTitle}>Your chats</DialogTitle>
-					</DialogHeader>
-					<div className={styles.dialogBody}>
-						<ChatList chats={chats} onChatClick={onChatClick} isLoading={isLoading} />
+					{!isViewingChat && (
+						<DialogHeader className={styles.dialogHeader}>
+							<DialogTitle className={styles.dialogTitle}>Your chats</DialogTitle>
+						</DialogHeader>
+					)}
+					<div
+						className={`${styles.dialogBody} ${
+							isViewingChat ? styles.dialogBodyChat : ""
+						}`}
+					>
+						{isViewingChat && selectedChat ? (
+							<ChatWindow
+								chat={selectedChat}
+								messages={messages}
+								onBack={onBackToList ?? (() => onOpenChange(true))}
+								currentUserId={currentUserId}
+								isLoading={isMessagesLoading}
+								error={messagesError}
+							/>
+						) : (
+							<ChatList
+								chats={chats}
+								onChatClick={onChatClick}
+								isLoading={isLoading}
+							/>
+						)}
 					</div>
 					<DialogPrimitive.Close className={styles.closeButton}>
 						<X size={16} />
@@ -55,4 +88,3 @@ export function ChatListDialog({
 		</Dialog>
 	);
 }
-
