@@ -42,9 +42,9 @@ export function Chat({
 	const [hubConnection, setHubConnection] = useState<HubConnection | null>(null);
 	const activeChatIdRef = useRef<string | null>(null);
 
-	const handleButtonClick = () => {
-		setIsOpen(true);
-	};
+    const handleButtonClick = () => {
+        setIsOpen(true);
+    };
 
 	const handleOpenChange = (open: boolean) => {
 		setIsOpen(open);
