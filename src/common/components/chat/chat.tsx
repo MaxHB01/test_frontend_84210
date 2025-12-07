@@ -26,6 +26,8 @@ export function Chat({
     const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [isMessagesLoading, setIsMessagesLoading] = useState(false);
     const [messagesError, setMessagesError] = useState<string | null>(null);
+    const [isSendingMessage, setIsSendingMessage] = useState(false);
+    const [sendMessageError, setSendMessageError] = useState<string | null>(null);
     const activeChatIdRef = useRef<string | null>(null);
 
 	const handleButtonClick = () => {
@@ -39,6 +41,8 @@ export function Chat({
             setSelectedChat(null);
             setMessages([]);
             setMessagesError(null);
+            setSendMessageError(null);
+            setIsSendingMessage(false);
             activeChatIdRef.current = null;
         }
     };
@@ -47,6 +51,7 @@ export function Chat({
         activeChatIdRef.current = chatId;
         setIsMessagesLoading(true);
         setMessagesError(null);
+        setSendMessageError(null);
         setMessages([]);
 
         try {
@@ -78,15 +83,50 @@ export function Chat({
 	const handleChatClick = (chat: ChatListItem) => {
         setSelectedChat(chat);
         setIsOpen(true);
-		onChatClick?.(chat);
-	};
+        onChatClick?.(chat);
+    };
 
     const handleBackToList = () => {
         setSelectedChat(null);
         setMessages([]);
         setMessagesError(null);
+        setSendMessageError(null);
         activeChatIdRef.current = null;
     };
+
+    const handleSendMessage = useCallback(
+        async (messageText: string) => {
+            if (!selectedChat) return;
+
+            setIsSendingMessage(true);
+            setSendMessageError(null);
+
+            try {
+                const response = await fetch(`/api/chatMessages/${selectedChat.id}`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ messageText }),
+                });
+
+                if (!response.ok) {
+                    throw new Error("Failed to send message");
+                }
+
+                const data = (await response.json()) as ChatMessage;
+
+                setMessages(previousMessages => [...previousMessages, data]);
+            } catch (error) {
+                setSendMessageError(
+                    error instanceof Error ? error.message : "Failed to send message"
+                );
+            } finally {
+                setIsSendingMessage(false);
+            }
+        },
+        [selectedChat]
+    );
 
     useEffect(() => {
         if (!selectedChat) return;
@@ -109,7 +149,10 @@ export function Chat({
                 isMessagesLoading={isMessagesLoading}
                 messagesError={messagesError}
                 currentUserId={currentUserId}
-			/>
-		</>
-	);
+                onSendMessage={handleSendMessage}
+                isSendingMessage={isSendingMessage}
+                sendMessageError={sendMessageError}
+            />
+        </>
+    );
 }

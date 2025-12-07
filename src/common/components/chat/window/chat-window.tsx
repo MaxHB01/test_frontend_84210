@@ -1,6 +1,14 @@
 ﻿"use client";
 
-import { type ReactElement, useEffect, useMemo, useRef } from "react";
+import {
+    type FormEvent,
+    type MouseEvent,
+    type ReactElement,
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
+} from "react";
 
 import { MessageSquare } from "lucide-react";
 
@@ -15,6 +23,9 @@ interface ChatWindowProps {
     currentUserId?: string | null;
     isLoading?: boolean;
     error?: string | null;
+    onSendMessage?: (messageText: string) => Promise<void> | void;
+    isSending?: boolean;
+    sendError?: string | null;
 }
 
 export function ChatWindow({
@@ -24,8 +35,12 @@ onBack,
 currentUserId,
 isLoading = false,
 error = null,
+onSendMessage,
+isSending = false,
+sendError = null,
 }: ChatWindowProps): ReactElement {
     const messagesEndRef = useRef<HTMLDivElement>(null);
+    const [messageText, setMessageText] = useState("");
 
     const emptyStateMessage = useMemo(() => {
         if (isLoading) return "Fetching messages...";
@@ -36,6 +51,22 @@ error = null,
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messages.length, isLoading]);
+
+    const handleSubmit = async (event: FormEvent | MouseEvent) => {
+        event.preventDefault();
+
+        const trimmedMessage = messageText.trim();
+
+        if (!trimmedMessage || !onSendMessage || isSending) return;
+
+        try {
+            await onSendMessage(trimmedMessage);
+            setMessageText("");
+            messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+        } catch {
+            // Error is handled by parent state
+        }
+    };
 
     const renderMessage = (message: ChatMessage) => {
         const isCurrentUser = currentUserId === message.userId;
@@ -99,14 +130,29 @@ error = null,
             </div>
 
             <div className={styles.messageInputBar} aria-label="Message input area">
-                <input
-                    type="text"
-                    className={styles.messageInput}
-                    placeholder="Type a message (sending coming soon)"
-                    disabled
-                />
-                <button type="button" className={styles.sendButton} disabled>
-                    Send
+                <form className={styles.messageForm} onSubmit={handleSubmit}>
+                    <input
+                        type="text"
+                        className={styles.messageInput}
+                        placeholder="Type a message"
+                        value={messageText}
+                        onChange={event => setMessageText(event.target.value)}
+                        disabled={isSending || !onSendMessage}
+                        aria-label="Type your message"
+                    />
+                    {sendError && <p className={styles.sendError}>{sendError}</p>}
+                </form>
+                <button
+                    type="submit"
+                    className={`${styles.sendButton} ${
+                        messageText.trim() && !isSending && onSendMessage
+                            ? styles.sendButtonEnabled
+                            : styles.sendButtonDisabled
+                    }`}
+                    onClick={handleSubmit}
+                    disabled={!messageText.trim() || isSending || !onSendMessage}
+                >
+                    {isSending ? "Sending..." : "Send"}
                 </button>
             </div>
         </div>

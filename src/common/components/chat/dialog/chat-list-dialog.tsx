@@ -6,7 +6,7 @@ import * as DialogPrimitive from "@radix-ui/react-dialog";
 
 import { X } from "lucide-react";
 
-import { Dialog, DialogHeader, DialogPortal, DialogTitle } from "@/common/components/ui/dialog"
+import { Dialog, DialogHeader, DialogPortal, DialogTitle } from "@/common/components/ui/dialog";
 
 import { ChatList } from "../list/chat-list";
 import type { ChatListItem, ChatMessage } from "../types";
@@ -25,6 +25,9 @@ interface ChatListDialogProps {
     isMessagesLoading?: boolean;
     messagesError?: string | null;
     currentUserId?: string | null;
+    onSendMessage?: (messageText: string) => Promise<void> | void;
+    isSendingMessage?: boolean;
+    sendMessageError?: string | null;
 }
 
 export function ChatListDialog({
@@ -39,6 +42,9 @@ export function ChatListDialog({
     isMessagesLoading = false,
     messagesError = null,
     currentUserId,
+    onSendMessage,
+    isSendingMessage = false,
+    sendMessageError = null,
 }: ChatListDialogProps): ReactElement {
     const isViewingChat = Boolean(selectedChat);
     
@@ -70,6 +76,9 @@ export function ChatListDialog({
                                 currentUserId={currentUserId}
                                 isLoading={isMessagesLoading}
                                 error={messagesError}
+                                onSendMessage={onSendMessage}
+                                isSending={isSendingMessage}
+                                sendError={sendMessageError}
                             />
                         ) : (
                             <ChatList
