@@ -18,3 +18,11 @@ export interface ChatListItem extends ChatApiResponse {
 	userInitials?: string;
 }
 
+export interface ChatMessage {
+    id: string;
+    chatId: string;
+    userId: string;
+    senderFullName: string;
+    text: string;
+    sentAt: string;
+}
