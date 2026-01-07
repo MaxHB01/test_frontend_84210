@@ -12,6 +12,7 @@ type UseProfileFormReturn = {
 	topicValue: string;
 	loading: boolean;
 	error: string | null;
+	success: boolean;
 	setFirstName: (value: string) => void;
 	setLastName: (value: string) => void;
 	setEmail: (value: string) => void;
@@ -21,6 +22,7 @@ type UseProfileFormReturn = {
 	setTopicValue: (value: string) => void;
 	setLoading: (value: boolean) => void;
 	setError: (value: string | null) => void;
+	setSuccess: (value: boolean) => void;
 };
 
 export function useProfileForm(initialData?: Partial<ProfileUpdateData>): UseProfileFormReturn {
@@ -35,6 +37,7 @@ export function useProfileForm(initialData?: Partial<ProfileUpdateData>): UsePro
 	const [topicValue, setTopicValue] = useState<string>("");
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
+	const [success, setSuccess] = useState(false);
 
 	// Use startTransition to batch state updates and avoid cascading renders
 	useEffect(() => {
@@ -64,6 +67,7 @@ export function useProfileForm(initialData?: Partial<ProfileUpdateData>): UsePro
 		topicValue,
 		loading,
 		error,
+		success,
 		setFirstName,
 		setLastName,
 		setEmail,
@@ -73,5 +77,6 @@ export function useProfileForm(initialData?: Partial<ProfileUpdateData>): UsePro
 		setTopicValue,
 		setLoading,
 		setError,
+		setSuccess,
 	};
 }

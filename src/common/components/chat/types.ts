@@ -19,10 +19,10 @@ export interface ChatListItem extends ChatApiResponse {
 }
 
 export interface ChatMessage {
-    id: string;
-    chatId: string;
-    userId: string;
-    senderFullName: string;
-    text: string;
-    sentAt: string;
+	id: string;
+	chatId: string;
+	userId: string;
+	senderFullName: string;
+	text: string;
+	sentAt: string;
 }

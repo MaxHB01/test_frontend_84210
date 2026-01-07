@@ -1,6 +1,6 @@
 "use client";
 
-import { type KeyboardEvent, type ReactElement, useMemo, useState } from "react";
+import { type KeyboardEvent, type ReactElement, useEffect, useMemo, useState } from "react";
 
 import {
 	Command,
@@ -10,6 +10,8 @@ import {
 	CommandItem,
 	CommandList,
 } from "@/common/components/ui/command";
+
+import { searchTopics } from "../api/search-topics.action";
 
 type TopicSelectorProps = {
 	topicValue: string;
@@ -114,17 +116,51 @@ export function TopicSelector({
 	onAddTopic,
 }: TopicSelectorProps): ReactElement {
 	const [open, setOpen] = useState(false);
+	const [searchedTopics, setSearchedTopics] = useState<string[]>([]);
+	const [isSearching, setIsSearching] = useState(false);
+
+	// Debounced search for topics
+	useEffect(() => {
+		if (!topicValue.trim()) {
+			setSearchedTopics([]);
+			return;
+		}
+
+		const timeoutId = setTimeout(() => {
+			void (async () => {
+				setIsSearching(true);
+				try {
+					const results = await searchTopics(topicValue);
+					setSearchedTopics(results);
+				} catch {
+					setSearchedTopics([]);
+				} finally {
+					setIsSearching(false);
+				}
+			})();
+		}, 300); // 300ms debounce
+
+		return () => clearTimeout(timeoutId);
+	}, [topicValue]);
 
 	const filteredSuggestions = useMemo(() => {
-		const available = suggestedTopics.filter(topic => !existingTopics.includes(topic));
+		// Use searched topics if available, otherwise fall back to static suggested topics
+		const topicsToUse = searchedTopics.length > 0 ? searchedTopics : suggestedTopics;
+		const available = topicsToUse.filter(topic => !existingTopics.includes(topic));
 
 		if (!topicValue.trim()) {
 			return available;
 		}
 
+		// If we have searched topics, return them directly (they're already filtered by the API)
+		if (searchedTopics.length > 0) {
+			return available;
+		}
+
+		// Otherwise, filter the static suggestions client-side
 		const searchLower = topicValue.toLowerCase();
 		return available.filter(topic => topic.toLowerCase().includes(searchLower));
-	}, [suggestedTopics, existingTopics, topicValue]);
+	}, [searchedTopics, suggestedTopics, existingTopics, topicValue]);
 
 	const isDuplicate = existingTopics.includes(topicValue.trim());
 
@@ -151,8 +187,14 @@ export function TopicSelector({
 							setOpen={setOpen}
 						/>
 					)}
-					{open && topicValue.trim() && filteredSuggestions.length === 0 && (
-						<TopicEmptyState topicValue={topicValue} />
+					{open &&
+						topicValue.trim() &&
+						filteredSuggestions.length === 0 &&
+						!isSearching && <TopicEmptyState topicValue={topicValue} />}
+					{open && isSearching && (
+						<CommandList className="absolute w-full left-0 top-full mt-1 bg-white border rounded-lg shadow-lg z-10">
+							<CommandEmpty>Searching topics...</CommandEmpty>
+						</CommandList>
 					)}
 				</Command>
 			</div>

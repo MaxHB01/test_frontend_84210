@@ -3,13 +3,19 @@
 import React from "react";
 
 import { Pencil } from "lucide-react";
+import type { Session } from "next-auth";
 import Link from "next/link";
 
 import { Button, CardHeader } from "@/common/components/ui";
 import type { Mentor } from "@/common/domain/entities/mentor";
 import { getInitials } from "@/lib/utils";
 
-export function ProfileHeader(mentor: Mentor) {
+type ProfileHeaderProps = {
+	mentor: Mentor;
+	session: Session | null;
+};
+
+export function ProfileHeader({ mentor, session }: ProfileHeaderProps) {
 	return (
 		<CardHeader className="flex items-center justify-between">
 			<div className="flex items-center">
@@ -20,13 +26,14 @@ export function ProfileHeader(mentor: Mentor) {
 					{mentor.firstName} {mentor.lastName}
 				</h1>
 			</div>
-
-			<Button asChild className={"self-start"}>
-				<Link href={`/edit-profile?id=${mentor.id}`}>
-					<Pencil />
-					Edit Profile
-				</Link>
-			</Button>
+			{mentor.id === session?.user?.id && (
+				<Button asChild className={"self-start"}>
+					<Link href={`/edit-profile?id=${mentor.id}`}>
+						<Pencil />
+						Edit Profile
+					</Link>
+				</Button>
+			)}
 		</CardHeader>
 	);
 }

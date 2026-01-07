@@ -1,6 +1,7 @@
 "use client";
 
 import { type ReactElement, useEffect, useRef, useState } from "react";
+
 import { usePathname } from "next/navigation";
 
 import { Chat } from "./chat";
@@ -8,44 +9,25 @@ import type { ChatListItem } from "./types";
 import { calculateUnreadCount } from "./utils";
 
 async function fetchSessionAndChats(pathname: string): Promise<{
-    hasSession: boolean;
-    chats: ChatListItem[];
-    unreadCount: number;
-    userId: string | null;
-    accessToken: string | null;
+	hasSession: boolean;
+	chats: ChatListItem[];
+	unreadCount: number;
+	userId: string | null;
 }> {
-    const isAuthPage = pathname.startsWith("/auth");
-    if (isAuthPage) {
-        return {
-            hasSession: false,
-            chats: [],
-            unreadCount: 0,
-            userId: null,
-            accessToken: null,
-        };
-    }
+	const isAuthPage = pathname.startsWith("/auth");
+	if (isAuthPage) {
+		return { hasSession: false, chats: [], unreadCount: 0, userId: null };
+	}
 
-    const sessionResponse = await fetch("/api/auth/session");
-    if (!sessionResponse.ok) {
-        return {
-            hasSession: false,
-            chats: [],
-            unreadCount: 0,
-            userId: null,
-            accessToken: null,
-        };
-    }
+	const sessionResponse = await fetch("/api/auth/session");
+	if (!sessionResponse.ok) {
+		return { hasSession: false, chats: [], unreadCount: 0, userId: null };
+	}
 
-    const session = await sessionResponse.json();
-    if (!session || !session.user) {
-        return {
-            hasSession: false,
-            chats: [],
-            unreadCount: 0,
-            userId: null,
-            accessToken: null,
-        };
-    }
+	const session = await sessionResponse.json();
+	if (!session || !session.user) {
+		return { hasSession: false, chats: [], unreadCount: 0, userId: null };
+	}
 
 	try {
 		const response = await fetch("/api/chat");
@@ -53,24 +35,22 @@ async function fetchSessionAndChats(pathname: string): Promise<{
 			const data = await response.json();
 			const chats = Array.isArray(data) ? data : [];
 			return {
-                hasSession: true,
-                chats,
-                unreadCount: calculateUnreadCount(chats),
-                userId: session.user.id as string,
-                accessToken: session.accessToken as string | null,
-            };
-        }
-    } catch {
+				hasSession: true,
+				chats,
+				unreadCount: calculateUnreadCount(chats),
+				userId: session.user.id as string,
+			};
+		}
+	} catch {
 		// Chat endpoint not available yet - still show button with empty chats
 	}
 
 	return {
-        hasSession: true,
-        chats: [],
-        unreadCount: 0,
-        userId: session.user.id as string,
-        accessToken: session.accessToken as string | null,
-    };
+		hasSession: true,
+		chats: [],
+		unreadCount: 0,
+		userId: session.user.id as string,
+	};
 }
 
 export function ChatProvider(): ReactElement | null {
@@ -78,8 +58,7 @@ export function ChatProvider(): ReactElement | null {
 	const [chats, setChats] = useState<ChatListItem[]>([]);
 	const [isLoading, setIsLoading] = useState(true);
 	const [unreadCount, setUnreadCount] = useState(0);
-    const [currentUserId, setCurrentUserId] = useState<string | null>(null);
-    const [accessToken, setAccessToken] = useState<string | null>(null);
+	const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 	const pathname = usePathname();
 	const isMountedRef = useRef(true);
 	const isFetchingRef = useRef(false);
@@ -94,21 +73,19 @@ export function ChatProvider(): ReactElement | null {
 
 			if (!isMountedRef.current) return;
 
-            setHasSession(result.hasSession);
-            setChats(result.chats);
-            setUnreadCount(result.unreadCount);
-            setCurrentUserId(result.userId);
-            setAccessToken(result.accessToken);
-            setIsLoading(false);
-        } catch {
-            if (!isMountedRef.current) return;
-            setHasSession(false);
-            setChats([]);
-            setCurrentUserId(null);
-            setAccessToken(null);
-            setIsLoading(false);
-        } finally {
-            isFetchingRef.current = false;
+			setHasSession(result.hasSession);
+			setChats(result.chats);
+			setUnreadCount(result.unreadCount);
+			setCurrentUserId(result.userId);
+			setIsLoading(false);
+		} catch {
+			if (!isMountedRef.current) return;
+			setHasSession(false);
+			setChats([]);
+			setCurrentUserId(null);
+			setIsLoading(false);
+		} finally {
+			isFetchingRef.current = false;
 		}
 	};
 
@@ -159,12 +136,11 @@ export function ChatProvider(): ReactElement | null {
 
 	return (
 		<Chat
-            chats={chats}
-            unreadCount={unreadCount}
-            onChatClick={handleChatClick}
-            isLoading={isLoading}
-            currentUserId={currentUserId}
-            accessToken={accessToken}
-        />
-    );
+			chats={chats}
+			unreadCount={unreadCount}
+			onChatClick={handleChatClick}
+			isLoading={isLoading}
+			currentUserId={currentUserId}
+		/>
+	);
 }

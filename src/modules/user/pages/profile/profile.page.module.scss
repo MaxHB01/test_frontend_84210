@@ -3,8 +3,10 @@
 	flex-direction: column;
 	margin-top: 50px;
 	align-items: center;
-	height: 100dvh;
-	width: 100dvw;
+	min-height: 100dvh;
+	width: 100%;
+	overflow-x: hidden;
+	padding-bottom: 2rem;
 }
 
 .topicCard {

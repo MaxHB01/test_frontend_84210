@@ -1,5 +1,6 @@
-import type { ChatListItem } from "../types";
 import { getInitials } from "@/lib/utils";
+
+import type { ChatListItem } from "../types";
 
 export { getInitials };
 
@@ -60,4 +61,3 @@ export function filterChatsByQuery(chats: ChatListItem[], query: string): ChatLi
 export function calculateUnreadCount(chats: ChatListItem[]): number {
 	return chats.filter(chat => chat.hasUnread).length;
 }
-

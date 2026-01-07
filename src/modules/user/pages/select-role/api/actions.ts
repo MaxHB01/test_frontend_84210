@@ -1,8 +1,9 @@
 "use server";
 
-import { AxiosResponse } from "axios";
+import type { AxiosResponse } from "axios";
 
-import { apiClient } from "@/lib";
+import { auth } from "@/auth";
+import { apiClient, logger } from "@/lib";
 
 export interface SelectRoleForm {
 	role: "mentor" | "student";
@@ -28,4 +29,25 @@ async function selectMentorRole(linkedInProfileUrl: string, biography: string, t
 		biography,
 		topics,
 	});
+}
+
+export async function refreshUserSession(): Promise<{ success: boolean; roles?: string[] }> {
+	try {
+		const session = await auth();
+		if (!session?.accessToken) {
+			return { success: false };
+		}
+
+		// Fetch fresh user profile to verify the role was updated
+		const { data } = await apiClient.get("/user/me");
+
+		if (data?.roles) {
+			return { success: true, roles: data.roles };
+		}
+
+		return { success: false };
+	} catch (error) {
+		logger.error("[REFRESH USER SESSION FAILED]", { error });
+		return { success: false };
+	}
 }

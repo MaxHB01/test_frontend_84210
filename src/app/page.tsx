@@ -14,7 +14,8 @@ export default async function Home(): Promise<React.JSX.Element> {
 
 	const { data } = await apiClient.get("/user/me");
 
-	if (data && data.roles.length === 0) {
+	// Check if user has no roles (null, undefined, or empty array)
+	if (!data?.roles || data.roles.length === 0) {
 		redirect("/role");
 	}
 

@@ -11,7 +11,7 @@ interface SignOutButtonProps {
 
 export default function SignOutButton({ className }: SignOutButtonProps): React.JSX.Element {
 	const handleSignOut = () => {
-		void signOut({ callbackUrl: "/" });
+		void signOut({ callbackUrl: "/auth/login" });
 	};
 
 	return (

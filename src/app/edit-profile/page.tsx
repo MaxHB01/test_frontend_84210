@@ -1,13 +1,10 @@
+import { ArrowLeft } from "lucide-react";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { auth } from "@/auth";
-import { Card, CardHeader } from "@/common/components/ui";
-import {
-	EditProfileForm,
-	getProfileData,
-	getSuggestedTopics,
-	updateProfileAction,
-} from "@/modules/user/pages/profile";
+import { Button, Card, CardHeader } from "@/common/components/ui";
+import { EditProfileForm, getProfileData, updateProfileAction } from "@/modules/user/pages/profile";
 import type { ProfileUpdateData } from "@/modules/user/pages/profile/api/dtos.types";
 
 type EditProfilePageProps = {
@@ -25,15 +22,11 @@ export default async function EditProfilePage({ searchParams }: EditProfilePageP
 	const userId = id ?? session.user.id;
 	const isMentor = session.user.roles?.includes("Mentor") ?? false;
 
-	const [profileData, suggestedTopics] = await Promise.all([
-		getProfileData(userId, isMentor),
-		isMentor ? getSuggestedTopics() : Promise.resolve([]),
-	]);
+	const profileData = await getProfileData(userId, isMentor);
 
 	async function handleSubmit(data: ProfileUpdateData) {
 		"use server";
-		await updateProfileAction(data, userId);
-		redirect(`/profile/${userId}`);
+		return await updateProfileAction(data, userId);
 	}
 
 	return (
@@ -41,14 +34,22 @@ export default async function EditProfilePage({ searchParams }: EditProfilePageP
 			<div className="mx-auto max-w-lg">
 				<Card className="overflow-visible relative">
 					<CardHeader>
-						<h1 className="text-center text-2xl font-bold text-foreground">
-							Edit Profile
-						</h1>
+						<div className="flex items-center gap-4">
+							<Button variant="ghost" size="icon" asChild className="hover:bg-accent">
+								<Link href={isMentor ? `/mentors/${userId}` : "/mentors"}>
+									<ArrowLeft className="size-5" />
+								</Link>
+							</Button>
+							<h1 className="text-center text-2xl font-bold text-foreground flex-1">
+								Edit Profile
+							</h1>
+							<div className="w-9" /> {/* Spacer for alignment */}
+						</div>
 					</CardHeader>
 					<EditProfileForm
 						isMentor={isMentor}
 						initialData={profileData}
-						suggestedTopics={suggestedTopics}
+						userId={userId}
 						onSubmit={handleSubmit}
 					/>
 				</Card>

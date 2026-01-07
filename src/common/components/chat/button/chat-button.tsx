@@ -1,6 +1,7 @@
 "use client";
 
-import type { ReactElement, MouseEventHandler } from "react";
+import type { MouseEventHandler, ReactElement } from "react";
+
 import { MessageCircleMore } from "lucide-react";
 
 import styles from "./chat-button.module.scss";
@@ -35,4 +36,3 @@ export function ChatButton({
 		</button>
 	);
 }
-

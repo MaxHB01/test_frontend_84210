@@ -1,10 +1,12 @@
 "use client";
 
 import type { ReactElement } from "react";
+
 import { MessageSquare } from "lucide-react";
 
 import type { ChatListItem } from "../types";
 import { ChatListItemComponent } from "./chat-list-item";
+
 import styles from "./chat-list.module.scss";
 
 interface ChatListProps {
@@ -51,4 +53,3 @@ export function ChatList({
 		</div>
 	);
 }
-

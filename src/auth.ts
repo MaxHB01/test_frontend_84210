@@ -57,6 +57,20 @@ async function fetchUserProfile(accessToken: string) {
 	});
 }
 
+async function fetchUserProfileDirect(accessToken: string) {
+	const apiUrl = process.env.API_URL;
+	if (!apiUrl) {
+		throw new Error("API_URL is not configured");
+	}
+
+	return axios.get<UserProfileResponse>(`${apiUrl}/user/me`, {
+		headers: {
+			Authorization: `Bearer ${accessToken}`,
+			"Content-Type": "application/json",
+		},
+	});
+}
+
 /* ----------------------------- AUTHORIZE USER ----------------------------- */
 
 async function authorizeUser(
@@ -123,6 +137,75 @@ function buildInitialToken(token: ExtendedToken, user: User): ExtendedToken {
 
 function isTokenValid(token: ExtendedToken): boolean {
 	return typeof token.expiresAt === "number" && Date.now() < token.expiresAt;
+}
+
+/* ------------------------- HANDLE TOKEN UPDATE ------------------------- */
+
+async function handleTokenUpdate(tk: ExtendedToken): Promise<ExtendedToken> {
+	try {
+		const userRes = await fetchUserProfileDirect(tk.accessToken!);
+		if (userRes.data) {
+			const { id, firstName, lastName, roles, email } = userRes.data;
+			const normalizedRoles = Array.isArray(roles) && roles.length > 0 ? roles : null;
+			return {
+				...tk,
+				id,
+				email: email || tk.email,
+				firstName,
+				lastName,
+				roles: normalizedRoles,
+			};
+		}
+	} catch (err) {
+		if (axios.isAxiosError(err)) {
+			logger.error("[FETCH USER PROFILE FAILED]", {
+				status: err.response?.status,
+				data: err.response?.data,
+				message: err.message,
+				url: err.config?.url,
+			});
+		} else {
+			logger.error("[FETCH USER PROFILE FAILED - UNKNOWN ERROR]", { error: err });
+		}
+	}
+	return tk;
+}
+
+async function handleMissingRoles(tk: ExtendedToken): Promise<ExtendedToken> {
+	try {
+		const userRes = await fetchUserProfileDirect(tk.accessToken!);
+		if (userRes.data) {
+			const { id, firstName, lastName, roles, email } = userRes.data;
+			const normalizedRoles = Array.isArray(roles) && roles.length > 0 ? roles : null;
+			if (normalizedRoles) {
+				return {
+					...tk,
+					id,
+					email: email || tk.email,
+					firstName,
+					lastName,
+					roles: normalizedRoles,
+				};
+			}
+		}
+	} catch {
+		// Silently fail - user might not have selected a role yet
+	}
+	return tk;
+}
+
+function handleTokenRefresh(tk: ExtendedToken): ExtendedToken | Promise<ExtendedToken> {
+	// If refreshToken missing → no refresh ever
+	if (!tk.refreshToken) return tk;
+
+	// If refresh previously failed → accept expired token
+	if (tk.error === "RefreshFailed") return tk;
+
+	// If still valid → keep it
+	if (isTokenValid(tk)) return tk;
+
+	// Otherwise, refresh
+	return refreshToken(tk);
 }
 
 /* ---------------------------- REFRESH TOKEN ---------------------------- */
@@ -210,23 +293,27 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 	],
 
 	callbacks: {
-		async jwt({ token, user }) {
+		async jwt({ token, user, trigger }) {
 			const tk = token as ExtendedToken;
 
 			// Initial sign in
 			if (user) return buildInitialToken(tk, user as User);
 
-			// If refreshToken missing → no refresh ever
-			if (!tk.refreshToken) return tk;
+			// Handle update trigger
+			if (trigger === "update" && tk.accessToken) {
+				return await handleTokenUpdate(tk);
+			}
 
-			// If refresh previously failed → accept expired token
-			if (tk.error === "RefreshFailed") return tk;
+			// Handle missing roles
+			if (
+				tk.accessToken &&
+				(!tk.roles || (Array.isArray(tk.roles) && tk.roles.length === 0))
+			) {
+				return await handleMissingRoles(tk);
+			}
 
-			// If still valid → keep it
-			if (isTokenValid(tk)) return tk;
-
-			// Otherwise, refresh
-			return await refreshToken(tk);
+			// Handle token refresh
+			return handleTokenRefresh(tk);
 		},
 
 		session({ session, token }) {
@@ -240,6 +327,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
 	pages: {
 		signIn: "/auth/login",
-		signOut: "/",
+		signOut: "/auth/login",
 	},
 });

@@ -2,6 +2,8 @@
 
 import type { ReactElement } from "react";
 
+import { CheckCircle2, XCircle } from "lucide-react";
+
 import { Button } from "@/common/components/ui/button";
 import { CardContent, CardFooter } from "@/common/components/ui/card";
 
@@ -14,22 +16,50 @@ import { useProfileForm } from "./use-profile-form";
 type EditProfileFormProps = {
 	isMentor: boolean;
 	initialData?: Partial<ProfileUpdateData>;
-	suggestedTopics?: string[];
-	onSubmit: (data: ProfileUpdateData) => Promise<void>;
+	userId: string;
+	onSubmit: (
+		data: ProfileUpdateData
+	) => Promise<{ success: true } | { success: false; error: string }>;
 };
 
 export function EditProfileForm({
 	isMentor,
 	initialData,
-	suggestedTopics = [],
+	userId,
 	onSubmit,
 }: EditProfileFormProps): ReactElement {
 	const formState = useProfileForm(initialData);
-	const handleSubmit = createSubmitHandler(formState, isMentor, onSubmit);
+	const handleSubmit = createSubmitHandler(formState, isMentor, userId, onSubmit);
 
 	return (
 		<form onSubmit={handleSubmit} className="contents">
 			<CardContent className="grid w-full items-center gap-4">
+				{formState.success && (
+					<div className="rounded-md bg-green-50 border border-green-200 p-4">
+						<div className="flex items-start gap-3">
+							<CheckCircle2 className="size-5 text-green-600 shrink-0 mt-0.5" />
+							<div className="flex-1">
+								<p className="text-sm font-medium text-green-800">
+									Profile updated successfully! Redirecting...
+								</p>
+							</div>
+						</div>
+					</div>
+				)}
+
+				{formState.error && (
+					<div className="rounded-md bg-red-50 border border-red-200 p-4">
+						<div className="flex items-start gap-3">
+							<XCircle className="size-5 text-red-600 shrink-0 mt-0.5" />
+							<div className="flex-1">
+								<p className="text-sm font-medium text-red-800">
+									Failed to update profile: {formState.error}
+								</p>
+							</div>
+						</div>
+					</div>
+				)}
+
 				<FormInputField
 					id="firstName"
 					label="First Name"
@@ -72,12 +102,7 @@ export function EditProfileForm({
 							setTopics: formState.setTopics,
 							setTopicValue: formState.setTopicValue,
 						}}
-						suggestedTopics={suggestedTopics}
 					/>
-				)}
-
-				{formState.error && (
-					<div className="text-sm text-destructive">{formState.error}</div>
 				)}
 			</CardContent>
 

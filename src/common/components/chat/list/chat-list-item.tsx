@@ -4,6 +4,7 @@ import type { ReactElement } from "react";
 
 import type { ChatListItem } from "../types";
 import { getInitials } from "../utils";
+
 import styles from "./chat-list.module.scss";
 
 interface ChatListItemProps {
@@ -40,8 +41,9 @@ export function ChatListItemComponent({ chat, onClick }: ChatListItemProps): Rea
 				</div>
 			</div>
 
-			{chat.hasUnread && <div className={styles.unreadIndicator} aria-label="Unread messages" />}
+			{chat.hasUnread && (
+				<div className={styles.unreadIndicator} aria-label="Unread messages" />
+			)}
 		</button>
 	);
 }
-

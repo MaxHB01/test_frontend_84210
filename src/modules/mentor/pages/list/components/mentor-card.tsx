@@ -25,7 +25,7 @@ export function MentorCard({ mentor }: MentorCardProps): React.JSX.Element {
 	const router = useRouter();
 
 	function goToProfilePage() {
-		void router.push("/profile/" + mentor.id);
+		void router.push("/mentors/" + mentor.id);
 	}
 
 	return (
